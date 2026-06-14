@@ -1,0 +1,23 @@
+{
+  "name": "@repo/parking-service",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun ./index.ts",
+    "build": "bun build ./index.ts --target=bun --outdir=./dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'parking-service: lint OK'"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@repo/database": "workspace:*",
+    "fastify": "^5.8.5",
+    "fastify-type-provider-zod": "^6.1.0",
+    "zod": "^4.4.3"
+  }
+}

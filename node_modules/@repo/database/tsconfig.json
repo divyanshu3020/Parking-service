@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {},
+  "include": ["index.ts", "prisma/**/*.ts"],
+  "exclude": ["node_modules"]
+}
