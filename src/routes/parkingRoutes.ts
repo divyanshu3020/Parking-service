@@ -17,7 +17,7 @@ export async function parkingRoutes(app: FastifyInstance) {
               z.object({
                 id: z.string(),
                 name: z.string(),
-                status: z.string(),
+                status:  z.string(),
               })
             ),
           }),
