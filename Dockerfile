@@ -4,7 +4,7 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 
 # Copy root configurations
-COPY package.json bun.lockb turbo.json ./
+COPY package.json bun.lock turbo.json ./
 
 # Copy shared database package and the specific service
 COPY packages/database ./packages/database
