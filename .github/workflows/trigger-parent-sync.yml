@@ -1,0 +1,16 @@
+name: Trigger Parent Sync
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify-parent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Event to Parent Repository
+        run: |
+          curl -X POST https://api.github.com/repos/${{ github.repository_owner }}/parking/dispatches \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" \
+          -d '{"event_type": "update-submodule", "client_payload": {"service": "parking-service"}}'
