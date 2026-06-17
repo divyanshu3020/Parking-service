@@ -3,20 +3,26 @@ FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
-# Copy root configurations
+# 1. Copy root metadata configuration
 COPY package.json bun.lock turbo.json ./
 
-# Copy shared database package and the specific service
+# 2. Copy the package.json for ALL workspace directories to satisfy the lockfile map
+COPY packages/database/package.json ./packages/database/
+COPY services/identity-service/package.json ./services/identity-service/
+COPY services/fintech-service/package.json ./services/fintech-service/
+COPY services/parking-service/package.json ./services/parking-service/
+COPY apps/web-admin/package.json ./apps/web-admin/
+COPY apps/web-user/package.json ./apps/web-user/
+
+# 3. Install dependencies globally across the workspace tree
+RUN bun install --frozen-lockfile
+
+# 4. Copy the actual source folders needed for this specific build context
 COPY packages/database ./packages/database
 COPY services/parking-service ./services/parking-service
 
-# Install all dependencies (frozen lockfile to ensure deterministic installation)
-RUN bun install --frozen-lockfile
-
-# Generate Prisma Client for the database package
+# 5. Generate Prisma client and build service payload
 RUN cd packages/database && bun run generate
-
-# Build the specific service
 RUN cd services/parking-service && bun run build
 
 # Final lightweight stage
