@@ -10,6 +10,8 @@ FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
+LABEL org.opencontainers.image.source="https://github.com/divyanshu3020/parking"
+
 # 1. Copy only the required package.jsons (extracted by turbo prune)
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/bun.lock ./bun.lock
