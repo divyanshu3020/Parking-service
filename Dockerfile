@@ -1,27 +1,26 @@
 # Context is the monorepo root
+FROM oven/bun:1 AS pruner
+
+WORKDIR /app
+COPY . .
+# Prune the workspace to only include parking-service and its dependencies
+RUN bunx turbo prune @repo/parking-service --docker
+
 FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
-# 1. Copy root metadata configuration
-COPY package.json bun.lock turbo.json ./
+# 1. Copy only the required package.jsons (extracted by turbo prune)
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/bun.lock ./bun.lock
 
-# 2. Copy the package.json for ALL workspace directories to satisfy the lockfile map
-COPY packages/database/package.json ./packages/database/
-COPY services/identity-service/package.json ./services/identity-service/
-COPY services/fintech-service/package.json ./services/fintech-service/
-COPY services/parking-service/package.json ./services/parking-service/
-COPY apps/web-admin/package.json ./apps/web-admin/
-COPY apps/web-user/package.json ./apps/web-user/
-
-# 3. Install dependencies globally across the workspace tree
+# 2. Install dependencies (this leverages Docker cache if package.jsons haven't changed)
 RUN bun install --frozen-lockfile
 
-# 4. Copy the actual source folders needed for this specific build context
-COPY packages/database ./packages/database
-COPY services/parking-service ./services/parking-service
+# 3. Copy the actual source code (extracted by turbo prune)
+COPY --from=pruner /app/out/full/ .
 
-# 5. Generate Prisma client and build service payload
+# 4. Generate Prisma client and build service payload
 RUN cd packages/database && bun run generate
 RUN cd services/parking-service && bun run build
 
